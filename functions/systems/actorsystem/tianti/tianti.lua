@@ -697,7 +697,7 @@ local function onMatchingActor(actor,packet)
 		var.is_matching = {}
 		var.is_matching.type = 0
 		var.is_matching.id = actor_id
-	else
+	else 
 		local conf = TianTiDanConfig[var.level][var.id]
 		if conf.MatchingRobot == 1 then
 			local id = math.random(1,#TianTiRobotConfig)
@@ -707,6 +707,9 @@ local function onMatchingActor(actor,packet)
 				LDataPack.writeInt(npack,0)
 			else 
 				local rconf = TianTiRobotConfig[id][0]
+				if(var.level == #TianTiDanConfig) then rconf.TianTiDan = 0 end
+				rconf.TianTiLevel = var.level
+				print("+++++++++++++++++++++++++++++++++++++++++++rconf.TianTiLevel:" .. rconf.TianTiLevel)
 				if rconf == nil then
 					LDataPack.writeInt(npack,0)
 					LDataPack.writeInt(npack,0)
