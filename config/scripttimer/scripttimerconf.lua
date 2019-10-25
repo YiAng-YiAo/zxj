@@ -19,10 +19,10 @@ TimerConfig=
 	-- 这个不要随便改，如果修改，同时要修改对应的脚本
 
 	{ week = {0,1,3,5}, hour = 0, minute = 0, func= "RefreshGuildBoss"}, -- 关闭公会boss
-	{ week = {1,3,5}, hour = 19, minute = 57, func= "CampBattleAdvance"}, -- 开启阵营战预告
-	{ week = {1,3,5}, hour = 20, minute = 0, func= "CampBattleOpen"}, -- 开启阵营战
-	{ week = {2,4}, hour = 19, minute = 57, func= "PassionPointAdvance"}, -- 开启激情泡点预告
-	{ week = {2,4}, hour = 20, minute = 0, func= "PassionPointOpen"}, -- 开启激情泡点
+	{ week = {0,1,2,3,4,5,6}, hour = {12,18}, minute = 57, func= "CampBattleAdvance"}, -- 开启阵营战预告
+	{ week = {0,1,2,3,4,5,6}, hour = {13,19}, minute = 0, func= "CampBattleOpen"}, -- 开启阵营战
+	{ week = {2,3,4}, hour = {11,13,19}, minute = 57, func= "PassionPointAdvance"}, -- 开启激情泡点预告
+	{ week = {2,3,4}, hour = {12,14,20}, minute = 0, func= "PassionPointOpen"}, -- 开启激情泡点
 	{ week={1},hour=10,minute =0,func= "OpenTianti", params = {true}}, -- 开启天梯
 	{ week={0},hour=22,minute =30,func= "CloseTianti"}, -- 关闭天梯 
 	{ hour=0,minute=5,func="ChangePrestigeExpData"},--凌晨回收威望
