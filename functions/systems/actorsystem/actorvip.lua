@@ -54,7 +54,21 @@ local function setExtMask( data, id )
     -- 设置标志位
     data.giftex[index] = System.bitOpSetMask(data.giftex[index] or 0, pos, true)
 end
-
+function sendSystemTips(actor,level,pos,tips)
+    local l = LActor.getZhuanShengLevel(actor) * 1000
+    l = l + LActor.getLevel(actor)
+    if l < level then 
+        return
+    end
+    local npack = LDataPack.allocPacket(actor, Protocol.CMD_Chat, Protocol.sChatCmd_Tipmsg)
+    if npack == nil then 
+        return
+    end
+    LDataPack.writeInt(npack,level)
+    LDataPack.writeInt(npack,pos)
+    LDataPack.writeString(npack,tips)
+    LDataPack.flush(npack)
+end
 local function onReqRewards(actor, packet)
     local level = LDataPack.readShort(packet)
     if level < 1 then return end
@@ -74,7 +88,19 @@ local function onReqRewards(actor, packet)
     if not LActor.canGiveAwards(actor, rewards) then
         return
     end
+    -- 进行礼包购买操作
 
+    --判断钱是否足够
+    local giftPrice = VipConfig[level].giftPrice
+    local yb = LActor.getCurrency(actor, NumericType_YuanBao)
+    if giftPrice > yb then 
+        -- print(LActor.getActorId(actor).." vip.onBuyGift yuanbao not enough id:"..id)
+        sendSystemTips(actor,1,2,"您的元宝数量不足")
+        return 
+    end
+    --扣钱
+    LActor.changeYuanBao(actor, 0 - giftPrice, "buy vip gift"..tostring(giftPrice))
+    
     data.record = System.bitOpSetMask(record, level -1 , true)
 
     local npack = LDataPack.allocPacket(actor, Protocol.CMD_Vip, Protocol.sVipCmd_UpdateRecord)

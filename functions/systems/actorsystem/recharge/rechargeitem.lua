@@ -55,15 +55,9 @@ end
 
 --获取该金额配置
 local function getConfig(count,paytype)
-    if paytype == nil or paytype == "" then
-        paytype = "android"
-    end
 	local conf = nil
 	for k, data in pairs(RechargeItemsConfig or {}) do
-		if data.amount == count and data.payType == paytype  then 
-            conf = data 
-            break 
-        end
+		if data.amount == count then conf = data break end
 	end
 
 	return conf

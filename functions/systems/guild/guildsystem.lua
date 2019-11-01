@@ -117,6 +117,21 @@ local function GetCreateGuildNeedVip(actor,conf)
 	end
 	return conf.vipLv
 end
+function sendSystemTips(actor,level,pos,tips)
+	local l = LActor.getZhuanShengLevel(actor) * 1000
+	l = l + LActor.getLevel(actor)
+	if l < level then 
+		return
+	end
+	local npack = LDataPack.allocPacket(actor, Protocol.CMD_Chat, Protocol.sChatCmd_Tipmsg)
+	if npack == nil then 
+		return
+	end
+	LDataPack.writeInt(npack,level)
+	LDataPack.writeInt(npack,pos)
+	LDataPack.writeString(npack,tips)
+	LDataPack.flush(npack)
+end
 function handleCreateGuild(actor, packet)
 	if not isOpen(actor) then return end
 
@@ -128,6 +143,14 @@ function handleCreateGuild(actor, packet)
 		LDataPack.writeByte(pack, ret)
 		LDataPack.writeInt(pack, guildId)
 		LDataPack.flush(pack)
+	end
+
+	local totalcash = LActor.getRecharge(actor)
+	print(totalcash)
+	if tonumber(index) == 2 and totalcash < 6000 then 
+		print("........global chat level")
+		sendSystemTips(actor,1,2,"首充能够创建2级仙盟")
+		return 
 	end
 
 	local conf = GuildCreateConfig[index]

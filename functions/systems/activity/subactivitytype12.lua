@@ -54,17 +54,6 @@ local function checkCanAward(actor, info)
 	return true
 end
 
-local function onReCharge(id, conf)
-	return function(actor, val)
-		if activitysystem.activityTimeIsEnd(id) then return end
-
-		local var = activitysystem.getSubVar(actor, id)
-
-		var.score = (var.score or 0) + math.floor(val/100)
-		activitysystem.sendActivityData(actor, id)
-	end
-end
-
 --下发数据
 local function writeRecord(npack, record, conf, id, actor)
     if nil == record then record = {} end
@@ -126,7 +115,7 @@ local function addNewRecord(type, id, hongbaoId, actorId, isGold, num, config, j
 	if 1 == type then
 		gVar.hongbaoId = (gVar.hongbaoId or 0) + 1
 	    if gVar.hongbaoId > 65535 then gVar.hongbaoId = 0 end  ----不能大于unsigned short
-		local endTime = System.getNowTime() + config.exitTime
+		local endTime = System.getNowTime() + 20
 		gVar.hongbao[gVar.hongbaoId] = {job=job, name=name, index=index, sex=sex, srvId=srvId, blessWord=word, endTime=endTime}
 
 		--记录发红包者,太多就移除第一条
@@ -157,7 +146,24 @@ local function addNewRecord(type, id, hongbaoId, actorId, isGold, num, config, j
 		end
 	end
 end
+local function onReCharge(id, conf)
+	local reward = addNewRecord
+	return function(actor, val)
+		if activitysystem.activityTimeIsEnd(id) then return end
+		local var = activitysystem.getSubVar(actor, id)
 
+		var.score = (var.score or 0) + math.floor(val/100)
+		activitysystem.sendActivityData(actor, id)
+
+		local job = LActor.getJob(actor)
+		local sex = LActor.getSex(actor)
+		local srvId = LActor.getServerId(actor)
+		local name = LActor.getName(actor)
+		if id == 565 then
+			reward(1, id, nil, nil, nil, nil, conf[1], job, sex, conf[1].index, srvId, name, "抢到红包啦!!!!!")
+		end
+	end
+end
 --判断本服还是跨服做不同的处理
 local function handleInfo(actor, id, config, blessWord)
 	local job = LActor.getJob(actor)

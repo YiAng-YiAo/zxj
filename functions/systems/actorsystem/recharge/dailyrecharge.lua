@@ -189,13 +189,7 @@ local function changeGold(actor)
     local pay_type = var.lastpaytype
 
     --获取首冲配置
-    local conf
-    for i,v in ipairs(FirstRechargeConfig) do
-        if  data.payCount == v.pay and pay_type == v.payType then
-            conf = v
-            break
-        end
-    end
+    local conf = FirstRechargeConfig[data.payCount or 0]
     if not conf then print("dailyrecharge.changeGold:conf is null:"..tostring(data.payCount)) return end
 
     LActor.changeYuanBao(actor, conf.payReturn - data.payCount, "第一次充值返还:"..tostring(conf.pay))
@@ -269,6 +263,7 @@ local function SendPayReturnAllMail()
 end
 
 local function onRecharge(actor, count)
+    print("dailyrecahrge: onRecharge")
     local data = getStaticData(actor)
     local actorId = LActor.getActorId(actor)
     data.payCount = (data.payCount or 0) + count

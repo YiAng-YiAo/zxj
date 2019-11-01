@@ -221,12 +221,23 @@ function sendGlobalMsg(actor,channe,msg)
 		print("shutup  " .. (var.shutup - os.time()))
 		return false
 	end
-
+	-- 四个连续数字则屏蔽整条消息
+	local is4Number = string.match(msg,"%d%d%d%d")
+	if is4Number then
+		-- UtilInfoLog("is4Number")
+		msg = "********"
+	end
 	local level = LActor.getZhuanShengLevel(actor) * 1000
 	level = level + LActor.getLevel(actor)
 	if level < global_chat_send_level then 
-		print("global chat level")
-		return false
+		print("global chat level.......")
+		local totalcash = LActor.getRecharge(actor)
+		print(totalcash)
+		if totalcash < 6000 then 
+			print("........global chat level")
+			sendSystemTips(actor,1,2,global_chat_send_level.."级或首充开启世界聊天")
+			return false
+		end
 	end
 	local conf = getConfig(actor) 
 	if conf == nil then 

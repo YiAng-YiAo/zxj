@@ -153,6 +153,10 @@ function handleActive(actor, packet)
     if conf.invalidtime then
         invalidTime = conf.invalidtime + System.getNowTime()
     end
+
+    if tonumber(itemId) == 1510101 and LActor.getVipLevel(actor) == 10 then
+        invalidTime = 0
+    end
     var.zhuangban[id] = invalidTime
     LActor.log(actor, "zhuangbansystem.handleActive", "mark1", id, var.zhuangban[id])
 
