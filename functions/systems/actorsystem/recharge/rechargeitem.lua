@@ -65,9 +65,8 @@ end
 
 --判断该索引的金额是否充值过了
 local function checkIsRecharge(actor, index)
-    local var = getStaticData(actor)
-    if not System.bitOPMask(var.record or 0, index) then return false end
-
+    local data = getStaticData(actor)
+    if not System.bitOPMask(data.record or 0, index) then return false end
     return true
 end
 
@@ -88,7 +87,7 @@ local function onRecharge(actor, count,itemid, ordernum, paytype)
     if not config then print("rechargeitem.onRecharge:config is nil, count:"..tostring(count)..", actorId:"..tostring(actorId)) return end
 
     if true == checkIsRecharge(actor, config.id) then
-    	--print("rechargeitem.onRecharge:already recharge before, count:"..tostring(count)..", actorId:"..tostring(actorId))
+    	print("rechargeitem.onRecharge:already recharge before, count:"..tostring(count)..", actorId:"..tostring(actorId))
     	return
     end
 

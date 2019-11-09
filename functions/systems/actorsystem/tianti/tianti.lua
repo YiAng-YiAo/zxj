@@ -700,7 +700,7 @@ local function onMatchingActor(actor,packet)
 	else
 		local conf = TianTiDanConfig[var.level][var.id]
 		if conf.MatchingRobot == 1 then
-			local id = math.random((1,#TianTiRobotConfig))
+			local id = math.random(1,#TianTiRobotConfig)
 			if TianTiRobotConfig[id] == nil then 
 				print("tianti.onMatchingActor not has robot cfg " .. id)
 				LDataPack.writeInt(npack,0)

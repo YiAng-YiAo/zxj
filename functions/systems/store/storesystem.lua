@@ -79,7 +79,6 @@ end
 function itemShoreBuy(actor, goodsList)
 	local yuanBao = 0
 	local itemList = {}
-	local logItemList = {}
 	--获取玩家VIP等级
 	local vipLv = LActor.getVipLevel(actor)
 	local var = getStoreVar(actor)
@@ -103,7 +102,6 @@ function itemShoreBuy(actor, goodsList)
 		end
 		if count > 0 then
 			table.insert(itemList, {itemId = config.itemId, count = count})
-			table.insert(logItemList, {itemId = config.itemId, count = count, price = count*config.price})
 			yuanBao = yuanBao + count*config.price
 		end
 	end
@@ -119,7 +117,7 @@ function itemShoreBuy(actor, goodsList)
 
 	--先扣钱
 	LActor.changeCurrency(actor, NumericType_YuanBao, -yuanBao,
-		"商店购买:"..tostring(itemList[1].itemId) .. ":".. tostring(itemList[1].count))
+		"item store buy:"..tostring(itemList[1].itemId) .. ":".. tostring(itemList[1].count))
 
 	print("item store buy:"..tostring(itemList[1].itemId) .. ":".. tostring(itemList[1].count))
 
@@ -127,17 +125,13 @@ function itemShoreBuy(actor, goodsList)
 
 	--再发货
 	for _,tb in pairs(itemList) do
-		LActor.giveAward(actor, AwardType_Item, tb.itemId, tb.count, "商店购买")
+		LActor.giveAward(actor, AwardType_Item, tb.itemId, tb.count, "item store buy")
 		var.vipLimitBuy[tb.itemId] = (var.vipLimitBuy[tb.itemId] or 0) + tb.count
 	end
 
 	sendItemStoreData(actor)
 	--告诉前端购买成功
 	reqBuyResult(actor)
-	for k,v in ipairs(logItemList) do
-		System.writeLocalLog(qlShop,actor,v.itemId, v.count, "", "",NumericType_YuanBao,v.price)
-	end
-	
 end
 
 --装备商店购买
@@ -181,7 +175,6 @@ function equipShoreBuy(actor, goodsList)
 	--扣钱
 	for _,money in pairs(moneyList) do
 		LActor.changeCurrency(actor, money.type, -money.value, "equip store buy:"..tostring(money.itemId) )
-		System.writeLocalLog(qlShop,actor,money.itemId, 1, "", "", money.type,money.value)
 		actorevent.onEvent(actor, aeStoreCost, money.type, money.value)
 	end
 	
@@ -194,7 +187,7 @@ function equipShoreBuy(actor, goodsList)
 
 	--发放购买的东西
 	for _,tb in pairs(goodsList) do
-		LActor.giveStoreItem(actor, tb.goodsId)		
+		LActor.giveStoreItem(actor, tb.goodsId)
 	end
 
 	--同步一下数据给前端
@@ -222,14 +215,12 @@ function refreshGoods(actor, isFirst)
 			--先判断有没有道具
 			if StoreCommonConfig.refreshItem and LActor.getItemCount(actor, StoreCommonConfig.refreshItem) > 0 then
 				LActor.costItem(actor, StoreCommonConfig.refreshItem, 1, "store refresh")
-				System.writeLocalLog(qlRefeshShop,actor, 1)  --物品刷新
 			else
 				local needMoney = StoreCommonConfig.refreshYuanBao
 				if needMoney > LActor.getCurrency(actor, NumericType_YuanBao) then
 					return
 				end
 				LActor.changeYuanBao(actor,-needMoney,"store refresh")
-				System.writeLocalLog(qlRefeshShop,actor, 2)	 --元宝刷新
 			end
 		end
 
@@ -325,9 +316,9 @@ function getCurrencyConfig(config)
 	local type, value, discount
 	local currencyRate = math.random(1,100)
 	if (config.ybProb >= currencyRate) then
-		type, value = NumericType_YuanBao, config.ybPrice
+		type, value = NumericType_YuanBao, 5 * config.ybPrice
 	else
-		type, value = NumericType_Gold, config.goldPrice
+		type, value = NumericType_Gold, 5 * config.goldPrice
 	end
 
 	discount = storecommon.discount_0
@@ -497,7 +488,9 @@ function handleQueryFeatsInfo(actor, packet)
 	local pos1 = LDataPack.getPosition(pack)
 	LDataPack.writeInt(pack, count)
 	for k,v in pairs(FeatsStore) do
+		print("in here ++++++++++++++++++++++++++++++++++++")
 		if var.featsExchange[k] then
+			print("+++++++++++++++++++++var.featsExchange[k]:++++++++++++++++++++++++++++++++++++" .. var.featsExchange[k])
 			LDataPack.writeInt(pack, k)
 			LDataPack.writeInt(pack, var.featsExchange[k])
 			count = count + 1
