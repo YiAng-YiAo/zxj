@@ -229,15 +229,11 @@ function sendGlobalMsg(actor,channe,msg)
 	end
 	local level = LActor.getZhuanShengLevel(actor) * 1000
 	level = level + LActor.getLevel(actor)
-	if level < global_chat_send_level then 
-		print("global chat level.......")
-		local totalcash = LActor.getRecharge(actor)
-		print(totalcash)
-		if totalcash < 6000 then 
-			print("........global chat level")
-			sendSystemTips(actor,1,2,global_chat_send_level.."级或首充开启世界聊天")
-			return false
-		end
+	local totalcash = LActor.getRecharge(actor)
+	print("totalcash:" .. totalcash)
+	if totalcash < 30000 then 
+		sendSystemTips(actor,1,2,"累充30元开启世界聊天")
+		return false
 	end
 	local conf = getConfig(actor) 
 	if conf == nil then 

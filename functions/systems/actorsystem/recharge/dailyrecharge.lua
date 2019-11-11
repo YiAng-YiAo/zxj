@@ -262,15 +262,6 @@ local function SendPayReturnAllMail()
     end
 end
 
-datadata = 0
-
-function firstChargeCount(actor)
-    local data = getStaticData(actor)
-    if 0 == (data.firstReward or 0) then
-        return data.payCount
-    end
-end
-
 local function onRecharge(actor, count)
     print("dailyrecahrge: onRecharge")
     local data = getStaticData(actor)
@@ -285,8 +276,6 @@ local function onRecharge(actor, count)
 
     --首次充值
     if 0 == (data.firstReward or 0) then
-        datadata = firstChargeCount(actor)
-        print("+++++++++++++++datadata:" .. datadata .. "+++++++++++++++++++++")
         data.firstReward = 1
         changeGold(actor)
         --元宝和特权卡赠送
