@@ -438,24 +438,19 @@ local function onReqAct(actor, packet)
 		--判断激活条件
 		if (SVar and SVar.login_day >= ExRingCfg.openDay and ExRingCfg.openDay >= 0) or --登陆天数满足
 			(vipLv >= ExRingCfg.openVip and ExRingCfg.openVip >= 0) then	--VIP等级满足
-			print("+++++++++++++++++++++++++++登录天数或vip满足！++++++++++++++++++++")
 			--判断是否完成了任务
 			for i,v in pairs(ExRingCfg.openTask or {}) do 
 				if not achievetask.isFinish(actor,v.achieveId,v.taskId) then 
-					print("+++++++++++++++++++++++++++前置任务未完成！++++++++++++++++++++")
 					print(LActor.getActorId(actor).." actorexring.onReqAct idx("..idx..") not finish openTask aid:"..v.achieveId..",tid:"..v.taskId)
 					return
 				end
-				print("+++++++++++++++++++++++++++前置任务完成！++++++++++++++++++++")
 			end
 			--判断是否要钱激活
 			if ExRingCfg.openYb and ExRingCfg.openYb > 0 then
 				if ExRingCfg.openYb > LActor.getCurrency(actor, NumericType_YuanBao) then
-					print("+++++++++++++++++++++++++++没钱激活不了！++++++++++++++++++++")
 					print(LActor.getActorId(actor).." actorexring.onReqAct idx("..idx..") is not have enough YuanBao")
 					return
 				end
-				print("+++++++++++++++++++++++++++有钱！++++++++++++++++++++")
 				LActor.changeYuanBao(actor, -ExRingCfg.openYb, "act actorExRing "..idx)
 			end
 		else
