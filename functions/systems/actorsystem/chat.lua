@@ -6,6 +6,12 @@ global_chat_list_max   = ChatConstConfig.saveChatListSize
 global_chat_char_len   = ChatConstConfig.chatLen
 global_chat_send_level = ChatConstConfig.openLevel
 
+local function SystemTips()
+	print("onSystemTips!")
+	noticemanager.broadCastNotice(500, "")
+end
+
+_G.SystemTips = SystemTips
 
 local function chsize(char)
 	if not char then

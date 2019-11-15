@@ -90,6 +90,18 @@ local function sendMonthCardData(actor)
 	LDataPack.flush(npack)
 end
 
+--发送一元特购信息
+local function sendOneYuanData(actor)
+	local var = LActor.getStaticVar(actor)
+	if var.oneyuan == nil then
+		var.oneyuan = 0 
+	end
+	local npack = LDataPack.allocPacket(actor, Protocol.CMD_Recharge, Protocol.sRechargeCmd_OneYuanData)
+	LDataPack.writeInt(npack, var.oneyuan)
+	LDataPack.flush(npack)
+end
+
+
 --增加月卡属性
 local function addMonthCardAttr(actor)
 	if false == isOpenMonthCard(actor) then return end
@@ -264,6 +276,18 @@ local function sendMonthCardFirstBuyRewardMail(actor)
 	mailsystem.sendMailById(actorId, mail_data)
 end
 
+--发送一元特购奖励邮件
+local function sendOneYuanRewardMail(actor)
+	local actorId = LActor.getActorId(actor)
+	local mail_data = {}
+	mail_data.head = MonthCardConfig.oneYuanBuyMailHead
+	mail_data.context = MonthCardConfig.oneYuanBuyContext
+	--获取创角职业
+    local role_data = LActor.getRoleData(actor, 0)
+	mail_data.tAwardList = MonthCardConfig.oneYuanBuyReward[role_data.job]
+	mailsystem.sendMailById(actorId, mail_data)
+end
+
 --发送开通特权奖励邮件
 local function sendPrivilegeOpenRewardMail(actor)
 	local actorVar =  LActor.getStaticVar(actor)
@@ -320,6 +344,16 @@ function buyMonthCard(actor)
 
 	noticemanager.broadCastNotice(MonthCardConfig.monthCardNotice, LActor.getName(actor))
 end
+
+--购买一元特购
+function buyOneYuan(actor)
+	--获取数据结构
+	local var = LActor.getStaticVar(actor)
+	var.oneyuan = 1
+	sendOneYuanRewardMail(actor)
+	sendOneYuanData(actor)
+end
+
 
 
 
@@ -404,6 +438,7 @@ local function onLogin(actor)
 	sendMonthCardRewardMail(actor)
 	sendPrivilegeRewardMail(actor)
 	updateGridNumber(actor)
+	sendOneYuanData(actor)
 end
 
 local function onBeforeLogin(actor)

@@ -30,6 +30,7 @@ TimerConfig=
 	{ week={1},hour=0,minute =0,func= "ResetFuwenTreasure"}, -- 重置符文寻宝累计次数 
 	{ week={1},hour=0,minute =0,func= "ResetHeirloomTreasure"}, -- 重置传世寻宝累计次数 
 	{ hour={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}, minute=0, func= "WorldBossOnHour"}, -- 世界boss的定点检测
+	{ hour={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23}, minute={0,15,30,45}, func= "SystemTips"}, -- 系统提示
 	{ hour=19,minute=20,func="newWorldBossPerStart", params = {600}},--新世界boss活动开启10分钟前
 	{ hour=19,minute=30,func="newWorldBossStart"},--新世界boss活动开启
 	{ hour= 20, minute = 30, func = "DevilBossOpen"}, --开始魔界入侵

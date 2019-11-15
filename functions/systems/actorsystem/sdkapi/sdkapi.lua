@@ -40,8 +40,8 @@ function onFeeCallback(packet)
 
 	if count == MonthCardConfig.monthCardMoney then
 		monthcard.buyMonth(actorid)
-    elseif count == PrivilegeData.priviMoney then
-        privilegemonthcard.buyPrivilegeMonth(actorid)
+    elseif count == 1000 then
+        monthcard.buyOneYuan(LActor.getActorById(actorid))
 	elseif count == PrivilegeData.priviMoney then 
             privilegemonthcard.buyPrivilegeMonth(actorid)
 	else
