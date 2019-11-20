@@ -104,17 +104,6 @@ local function buyPrivilegeMonthCard(actor)
 	else
 		var.endTime = var.endTime + PrivilegeData.priviCardDays * daySec
 	end
-	-- 直升VIP18
-	if LActor.getVipLevel(actor) < 18 then
-		LActor.setVipLevel(actor, 18)
-		local npack = LDataPack.allocPacket(actor, Protocol.CMD_Vip, Protocol.sVipCmd_UpdateExp)
-	    LDataPack.writeShort(npack, 18)
-	    LDataPack.writeInt(npack, 0)
-	    LDataPack.writeShort(npack, 0)
-	    LDataPack.flush(npack)
-	else
-		print("+++++++++++++++++++viplv>=18++++++++++++++++++")
-	end
 	-- 添加称号
 	addPriviTitle(actor, PrivilegeData.priviBoss, var.endTime)
 	-- 发送邮件

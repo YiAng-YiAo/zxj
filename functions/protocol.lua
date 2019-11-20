@@ -678,7 +678,6 @@ Protocol = {
 	sRechargeCmd_RechargeItemRecord = 8,
 	sRechargeCmd_RechargeDaysAward = 9,
 	sRechargeCmd_MonthCardData = 20,
-	sRechargeCmd_OneYuanData = 21,
 	sRechargeCmd_PrivilegeMonthCardData = 11, -- 下发特权数据
 	sRechargeCmd_MultiDayRechargeData = 12,
 	

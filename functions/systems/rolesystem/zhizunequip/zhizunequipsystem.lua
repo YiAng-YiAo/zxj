@@ -1,6 +1,6 @@
 module("zhizunequipsystem", package.seeall)
 
-local openLevel = 4000
+local openLevel = 5000
 
 function sendInfo(actor, roleId, posId, level)
 	local npack = LDataPack.allocPacket(actor, Protocol.CMD_Equip, Protocol.sEquipCmd_ReqZhiZunLevelUp)

@@ -34,20 +34,22 @@ end
 local function getReward(actor)
 	local data = getStaticData(actor)
 	local actorId = LActor.getActorId(actor)
-	-- 赠送VIP12
-	LActor.setVipLevel(actor, 12)
+	-- 赠送VIP10
+	LActor.setVipLevel(actor, 10)
 	local npack = LDataPack.allocPacket(actor, Protocol.CMD_Vip, Protocol.sVipCmd_UpdateExp)
-    LDataPack.writeShort(npack, 12)
+    LDataPack.writeShort(npack, 10)
     LDataPack.writeInt(npack, 0)
     LDataPack.writeShort(npack, 0)
     LDataPack.flush(npack)
     -- 赠送物品
 	local mail_data = {}
 	mail_data.head = '新人礼包'
-	mail_data.context = '上线就送:VIP12,38888元宝,10000000铜钱!!'
-	mail_data.tAwardList = {{type=0,id=2,count=38888},{type=0,id=1,count=10000000}}
+	mail_data.context = '上线就送:VIP10,588888元宝,20000000铜钱!!'
+	mail_data.tAwardList = {{type=0,id=2,count=588888},{type=0,id=1,count=20000000}}
 	mailsystem.sendMailById(LActor.getActorId(actor),mail_data)
 	data.reward = 1
+	--赠送首冲
+	dailyrecharge.giveFirstRecharge(actor)
 	sendData(actor)
 	return true
 end

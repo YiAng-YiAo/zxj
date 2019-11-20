@@ -88,6 +88,13 @@ function isFirstRecharge(actor)
     return 0 == (var.firstReward or 0)
 end
 
+--首冲可领取
+function giveFirstRecharge(actor)
+    local var = getStaticData(actor)
+    var.firstReward = 1
+    LDataPack.writeInt(npack, var.firstReward or 0)
+end
+
 --补发每日充值奖励
 local function sendDailyRewardMail(actor)
     local var = getStaticData(actor)
