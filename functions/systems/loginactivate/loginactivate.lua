@@ -44,8 +44,8 @@ local function getReward(actor)
     -- 赠送物品
 	local mail_data = {}
 	mail_data.head = '新人礼包'
-	mail_data.context = '上线就送:VIP12,38888元宝!!'
-	mail_data.tAwardList = {{type=0,id=2,count=38888}}
+	mail_data.context = '上线就送:VIP12,38888元宝,10000000铜钱!!'
+	mail_data.tAwardList = {{type=0,id=2,count=38888},{type=0,id=1,count=10000000}}
 	mailsystem.sendMailById(LActor.getActorId(actor),mail_data)
 	data.reward = 1
 	sendData(actor)
