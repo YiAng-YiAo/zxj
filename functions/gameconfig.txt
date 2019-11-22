@@ -96,6 +96,7 @@
 --#include "data/config/store/equipgroup.config"
 --#include "data/config/store/equipitem.config"
 --#include "data/config/store/itemstore.config"
+--#include "data/config/store/GMstore.config"
 --#include "data/config/store/storecommon.config"
 --#include "data/config/store/firstbooklist.config"
 --#include "data/config/store/integralstore.config"
