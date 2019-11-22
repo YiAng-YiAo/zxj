@@ -92,7 +92,7 @@ end
 function giveFirstRecharge(actor)
     local var = getStaticData(actor)
     var.firstReward = 1
-    LDataPack.writeInt(npack, var.firstReward or 0)
+    sendInitInfo(actor)
 end
 
 --补发每日充值奖励
