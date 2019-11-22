@@ -40,6 +40,31 @@ function getStoreVar(actor)
 	if var.store.vipLimitBuy == nil then
 		var.store.vipLimitBuy = {}
 	end
+	return var.store
+end
+
+--GM商店数据
+function getGMStoreVar(actor)
+	local var = LActor.getStaticVar(actor)
+	if (var == nil) then
+		return
+	end
+
+	if (var.store == nil) then
+		var.store = {}
+	end
+
+	if var.store.dayCount == nil then
+		var.store.dayCount = 0
+	end
+
+	if var.store.LimitBuy == nil then
+		var.store.LimitBuy = {}
+	end
+
+	if var.store.val == nil then
+		var.store.val = {}
+	end
 
 	return var.store
 end
@@ -66,10 +91,34 @@ local function sendItemStoreData(actor)
 	LDataPack.flush(npack)
 end
 
+--下发GM商城的数据
+local function sendGMStoreData(actor)
+	local storeVar = getGMStoreVar(actor)
+	local npack = LDataPack.allocPacket(actor, Protocol.CMD_Store, Protocol.sStoreCmd_GMStoreData)
+	if npack == nil then return end
+	local count = 0
+	local pos = LDataPack.getPosition(npack)
+	LDataPack.writeShort(npack, count)
+	for _,v in ipairs(GMStoreConfig) do
+		if storeVar.LimitBuy[v.itemId] then
+			count = count + 1
+			LDataPack.writeInt(npack, v.itemId)
+			LDataPack.writeInt(npack, storeVar.LimitBuy[v.itemId] or 0)
+		end
+	end
+	local pos2 = LDataPack.getPosition(npack)
+	LDataPack.setPosition(npack, pos)
+	LDataPack.writeShort(npack, count)
+	LDataPack.setPosition(npack, pos2)
+	LDataPack.flush(npack)
+end
+
 --购买商品，通过商店类型和商品列表购买
 function buyGoods(actor, storeType, goodsList)
 	if (storeType == storecommon.itemStore) then
 		itemShoreBuy(actor, goodsList)
+	elseif (storeType == storecommon.GMStore) then
+		GMShoreBuy(actor, goodsList)
 	else
 		equipShoreBuy(actor, goodsList)
 	end
@@ -140,8 +189,85 @@ function itemShoreBuy(actor, goodsList)
 	
 end
 
+--GM商店购买
+function GMShoreBuy(actor, goodsList)
+	local yuanBao = 0
+	local GMitemList = {}
+	local logGMItemList = {}
+	--获取玩家充值金额
+	local totalcash = LActor.getRecharge(actor)
+	local var = getGMStoreVar(actor)
+	--遍历一下，看有没有非法数据，顺便把总的价钱算一下
+	for _,tb in pairs(goodsList) do
+		local config = storecommon.getGoodsConfig(storecommon.GMStore, tb.goodsId)
+		if (not config) then
+			return
+		end
+		if (tb.count <= 0) then
+			return
+		end
+		--VIP等级限制
+		if config.viplv and vipLv < config.viplv then
+			return
+		end
+		--累充限制
+		if GMStoreConfig[tb.goodsId].val and totalcash < GMStoreConfig[tb.goodsId].val then
+			chat.sendSystemTips(actor,1,2,"累充" .. GMStoreConfig[tb.goodsId].val/10000 .."元开启购买权限")
+			return
+		end
+		local count = tb.count --购买数量
+		local allcount = count * GMStoreConfig[tb.goodsId].count --购买总数
+		if config.Limit then --购买数量限制
+			local left_count = (config.Limit or 0) - (var.LimitBuy[config.itemId] or 0)
+			count = math.min(tb.count, left_count)
+		end
+		if count > 0 then
+			table.insert(GMitemList, {itemId = config.itemId, count = allcount})
+			table.insert(logGMItemList, {itemId = config.itemId, count = count, price = count*config.price})
+			yuanBao = yuanBao + count*config.price
+		end
+	end
+
+	if #GMitemList <= 0 then
+		return
+	end
+
+	local curYuanBao = LActor.getCurrency(actor, NumericType_YuanBao)
+	if (curYuanBao < yuanBao) then
+		return
+	end
+
+	--先扣钱
+	LActor.changeCurrency(actor, NumericType_YuanBao, -yuanBao,
+		"GM商店购买:"..tostring(GMitemList[1].itemId) .. ":".. tostring(GMitemList[1].count))
+
+	print("item store buy:"..tostring(GMitemList[1].itemId) .. ":".. tostring(GMitemList[1].count))
+
+	actorevent.onEvent(actor, aeStoreCost, NumericType_YuanBao, yuanBao)
+
+	--再发货
+	for _,tb in pairs(GMitemList) do
+		if tb.itemId == 201103 then
+			LActor.giveAward(actor,0,2,1000000, "商店购买")
+			var.LimitBuy[tb.itemId] = (var.LimitBuy[tb.itemId] or 0) + tb.count
+		else
+			LActor.giveAward(actor, AwardType_Item, tb.itemId, tb.count, "商店购买")
+			var.LimitBuy[tb.itemId] = (var.LimitBuy[tb.itemId] or 0) + tb.count
+		end
+	end
+
+	sendGMStoreData(actor)
+	--告诉前端购买成功
+	reqBuyResult(actor)
+	for k,v in ipairs(logGMItemList) do
+		System.writeLocalLog(qlShop,actor,v.itemId, v.count, "", "",NumericType_YuanBao,v.price)
+	end
+	
+end
+
 --装备商店购买
 function equipShoreBuy(actor, goodsList)
+	local var = getStaticVar(actor)
 	--需要多少钱的汇总
 	local totalCost = {}
 	local moneyList = {}
@@ -363,7 +489,6 @@ function buyGoods_c2s(actor, pack)
 
 		table.insert(goodsList, {goodsId = goodsId, count = count})
 	end
-
 	buyGoods(actor, storeType, goodsList)
 end
 
@@ -436,11 +561,13 @@ function onLogin(actor, firstLogin)
 	LActor.StoreDataSync(actor, storeVar.refreshCount)
 
 	--发送已购买(限制)数量
+	sendGMStoreData(actor)
 	sendItemStoreData(actor)
 end
 
 function onNewDay(actor, login)
 	local storeVar = getStoreVar(actor)
+	local GMstoreVar = getGMStoreVar(actor)
 	if (storeVar ~= nil) then
 		storeVar.refreshCount = 0
 		storeVar.dayCount = 0
@@ -451,6 +578,12 @@ function onNewDay(actor, login)
 		end
 		storeVar.vipLimitBuy = {}
 		sendItemStoreData(actor)
+	end
+
+	if (GMstoreVar ~= nil) then
+		GMstoreVar.dayCount = 0
+		GMstoreVar.LimitBuy = {}
+		sendGMStoreData(actor)
 	end
 
 	if not login then
@@ -466,8 +599,6 @@ function reqBuyResult(actor)
 
 	LDataPack.flush(pack)
 end
-
-
 
 -- exern
 

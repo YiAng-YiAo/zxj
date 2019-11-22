@@ -490,6 +490,7 @@ Protocol = {
 	sStoreCmd_BuyIntegralItem = 5,
 	sCMD_StoreFeatsInfo = 6,
 	sCMD_StoreFeatsExchange = 7,
+	sStoreCmd_GMStoreData = 8,
 
 	cStoreCmd_DataRequest = 1,
 	cStoreCmd_Buy = 2,

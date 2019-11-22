@@ -2,6 +2,7 @@ module("storecommon", package.seeall)
 
 itemStore = 1
 equipStore = 2
+GMStore = 4
 maxGoodsNum = 5
 
 discount_0 = 0
@@ -24,6 +25,8 @@ end
 function getGoodsConfig(storeType, goodsId)
 	if (itemStore == storeType) then
 		return ItemStoreConfig[goodsId]
+	elseif (GMStore == storeType) then
+		return GMStoreConfig[goodsId]
 	else
 		return EquipItemConfig[goodsId]
 	end
