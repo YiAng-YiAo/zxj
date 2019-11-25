@@ -38,9 +38,9 @@ function onFeeCallback(packet)
 
     if 0 >= count then return end
 
-	if count == MonthCardConfig.monthCardMoney then
+--[[	if count == MonthCardConfig.monthCardMoney then
 		monthcard.buyMonth(actorid)
-    elseif count == PrivilegeData.priviMoney then
+    else--]]if count == PrivilegeData.priviMoney then
         privilegemonthcard.buyPrivilegeMonth(actorid)
 	elseif count == PrivilegeData.priviMoney then 
             privilegemonthcard.buyPrivilegeMonth(actorid)
